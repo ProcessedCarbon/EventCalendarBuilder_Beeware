@@ -10,7 +10,11 @@ from eventcalendarbuilder.PythonFiles.Calendar.GoogleCalendar.GoogleCalendarInte
 import eventcalendarbuilder.PythonFiles.Calendar.Outlook.OutlookInterface as outlook_interface
 
 # Pages
-from eventcalendarbuilder.Pages.schedule_event_page import ScheduleEventPage
+from eventcalendarbuilder.GUI.Pages.schedule_event_page import ScheduleEventPage
+from eventcalendarbuilder.GUI.Pages.manage_event_page import ManageEventPage
+
+# GUI
+from eventcalendarbuilder.GUI.navbar import NavBar
 
 class EventCalendarBuilder(toga.App):
     def startup(self):
@@ -20,50 +24,43 @@ class EventCalendarBuilder(toga.App):
         We then create a main window (with a name matching the app), and
         show the main window.
         """
+        # APIs
         # GoogleCalendarInterface.ConnectToGoogleCalendar()
         # outlook_interface.start_flask()
         self.pages = []
-
-        # App nav bar
-        left_content = toga.Box(style=Pack(direction=COLUMN, padding_top=10))
-        left_content.add(toga.Button('Schedule Events', on_press=lambda widget:self.show_page(0)))
-        left_content.add(toga.Button('Manage Events', on_press=lambda widget:self.show_page(1)))
-        left_container = toga.ScrollContainer(horizontal=False)
-        left_container.content = left_content
-
-        self.right_container = toga.ScrollContainer(horizontal=False)
-
         self.main_window = toga.MainWindow(title=self.formal_name)
         
         # Pages
         schedule_event_page = ScheduleEventPage()
+        manage_event_page = ManageEventPage()
+        self.pages.append(schedule_event_page)
+        self.pages.append(manage_event_page)
 
-        # Create content for Page 2
-        self.page2_box = toga.Box()
-        self.page2_label = toga.Label('This is Page 2')
-        self.page2_textinput = toga.TextInput()
-        self.page2_box.add(self.page2_label)
-        self.page2_box.add(self.page2_textinput)
+        # Right Side Container (Pages)
+        self.current_page = schedule_event_page
+        self.right_container = toga.ScrollContainer(horizontal=False)
+        self.right_container.content = toga.Box(children=[self.current_page.getPage()], style=Pack(direction=COLUMN))
 
-        # Append pages to list
-        self.pages.append(schedule_event_page.getPage())
-        self.pages.append(self.page2_box)
-
-        # Create a box container for the content
-        self.current_page = schedule_event_page.getPage()
-        self.right_container = toga.Box(children=[self.current_page], style=Pack(direction=COLUMN))
+        # Left Side Container (NavBar)
+        nav_bar = NavBar(nav_bar_buttons={
+            "Schedule Events" : lambda widget:self.show_page(0),
+            "Manage Events" : lambda widget:self.show_page(1)
+        })
+        left_container = toga.ScrollContainer(horizontal=False)
+        left_container.content = nav_bar.get_navbar()
 
         # Add the button box and content box to the main window
         split = toga.SplitContainer()
-        split.content = [(left_container, 1), (self.right_container, 2)]
+        split.content = [(left_container, 1), (self.right_container, 3)]
         self.main_window.content = split
 
         self.main_window.show()
 
     def show_page(self, page_number):
-        self.right_container.remove(self.current_page)
+        self.current_page.on_remove()
+        self.right_container.content.remove(self.current_page.getPage())
         self.current_page = self.pages[page_number]
-        self.right_container.add(self.current_page)
+        self.right_container.content.add(self.current_page.getPage())
 
 def main():
     return EventCalendarBuilder()

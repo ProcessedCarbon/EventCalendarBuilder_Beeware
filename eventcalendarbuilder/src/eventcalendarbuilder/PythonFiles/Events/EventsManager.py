@@ -106,6 +106,7 @@ class EventsManager:
     # Directories
     parent_dir = Path(os.path.dirname(os.path.realpath(__file__))).absolute()
     local_events_dir = Path(os.path.join(parent_dir, 'Local_Events'))
+    print(f'Local events dir: {local_events_dir}')
     event_json = 'events.json'
     
     # Temporary event list

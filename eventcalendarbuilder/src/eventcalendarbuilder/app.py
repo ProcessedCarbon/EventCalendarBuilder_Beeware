@@ -16,6 +16,9 @@ from eventcalendarbuilder.GUI.Pages.manage_event_page import ManageEventPage
 # GUI
 from eventcalendarbuilder.GUI.navbar import NavBar
 
+ENABLE_GOOGLE = False
+ENABLE_OUTLOOK = False
+
 class EventCalendarBuilder(toga.App):
     def startup(self):
         """Construct and show the Toga application.
@@ -25,8 +28,9 @@ class EventCalendarBuilder(toga.App):
         show the main window.
         """
         # APIs
-        # GoogleCalendarInterface.ConnectToGoogleCalendar()
-        # outlook_interface.start_flask()
+        if ENABLE_GOOGLE: GoogleCalendarInterface.ConnectToGoogleCalendar()
+        if ENABLE_OUTLOOK: outlook_interface.start_flask()
+        
         self.pages = []
         self.main_window = toga.MainWindow(title=self.formal_name)
         

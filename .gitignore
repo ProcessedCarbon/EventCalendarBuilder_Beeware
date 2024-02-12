@@ -161,4 +161,4 @@ cython_debug/
 
 # Personal Files
 model/
-fypvenv/
+fypenv/

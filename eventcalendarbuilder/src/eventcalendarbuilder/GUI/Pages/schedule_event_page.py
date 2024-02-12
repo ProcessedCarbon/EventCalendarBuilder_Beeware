@@ -16,7 +16,7 @@ class ScheduleEventPage(Page):
         self.input = toga.MultilineTextInput(style=Pack(padding_top=10, height=300))
         self.get_entities_btn = toga.Button('Click me', on_press=self.get_entities_from_input, style=Pack(padding_top=10))
         self.result_container = toga.ScrollContainer(horizontal=False, style=Pack(flex=1))
-        self.result_content = toga.Box(style=Pack(direction=COLUMN, padding_top=10, height=500))
+        self.result_content = toga.Box(style=Pack(direction=COLUMN, padding_top=10))
         self.result_container.content = self.result_content
 
         self.page_box.add(self.title)
@@ -32,6 +32,8 @@ class ScheduleEventPage(Page):
 
         text = self.input.value
         if text == "" or text == " " or text == "\n":
+            # Popup used for now 
+            toga.Window().error_dialog(title='Warning!', message='No text detected. Please input text!')
             return
         
         text.strip("\n").strip()
@@ -41,6 +43,7 @@ class ScheduleEventPage(Page):
         
         for index, e in enumerate(added_events):
             #self.result_content.add(toga.Label(id=index, text=e))
+            #print(e['object'].getEventDict())
             card = EventConfigureCard()
             self.result_content.add(card.get_card())
 

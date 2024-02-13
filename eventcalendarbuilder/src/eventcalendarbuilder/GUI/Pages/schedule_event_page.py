@@ -13,7 +13,7 @@ class ScheduleEventPage(Page):
     def __init__(self):
         super().__init__()
         self.title = toga.Label('Schedule Page', style=Pack(text_align=CENTER))
-        self.input = toga.MultilineTextInput(style=Pack(padding_top=10, height=300))
+        self.input = toga.MultilineTextInput(style=Pack(padding_top=10, height=200))
         self.get_entities_btn = toga.Button('Click me', on_press=self.get_entities_from_input, style=Pack(padding_top=10))
         self.result_container = toga.ScrollContainer(horizontal=False, style=Pack(flex=1))
         self.result_content = toga.Box(style=Pack(direction=COLUMN, padding_top=10))
@@ -41,13 +41,15 @@ class ScheduleEventPage(Page):
         p_events = EventsManager.ProcessEvents(events)
         added_events = EventsManager.AddEvents(events=p_events)
         
-        for index, e in enumerate(added_events):
-            #self.result_content.add(toga.Label(id=index, text=e))
-            #print(e['object'].getEventDict())
-            card = EventConfigureCard()
+        for e in added_events:
+            card = EventConfigureCard(event=e['object'], remove_cb=self.remove_card)
             self.result_content.add(card.get_card())
+            self.result_content.add(toga.Divider())
 
     def on_remove(self):
         super().on_remove()
         self.input.value = ''
     
+    def remove_card(self, card=None):
+        if card == None: return
+        self.result_content.remove(card)

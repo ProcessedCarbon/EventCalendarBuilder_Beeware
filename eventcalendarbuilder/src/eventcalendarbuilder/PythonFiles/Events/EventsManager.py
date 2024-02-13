@@ -1,6 +1,7 @@
 import subprocess
 from uuid import uuid4
 from eventcalendarbuilder.PythonFiles.Calendar.CalendarInterface import CalendarInterface
+from eventcalendarbuilder.PythonFiles.Calendar.calendar_constants import ScheduleStatus, DEFAULT_CALENDAR, GOOGLE_CALENDAR, OUTLOOK_CALENDAR
 import eventcalendarbuilder.PythonFiles.Calendar.Outlook.OutlookInterface as outlook_interface
 from eventcalendarbuilder.PythonFiles.Calendar.GoogleCalendar.GoogleCalendarInterface import GoogleCalendarInterface
 from pathlib import Path
@@ -106,7 +107,6 @@ class EventsManager:
     # Directories
     parent_dir = Path(os.path.dirname(os.path.realpath(__file__))).absolute()
     local_events_dir = Path(os.path.join(parent_dir, 'Local_Events'))
-    print(f'Local events dir: {local_events_dir}')
     event_json = 'events.json'
     
     # Temporary event list
@@ -325,7 +325,6 @@ class EventsManager:
                                                     start_time=start_time,
                                                     end_time=end_time,
                                                     recurring=recurring)
-                #print(vars(n_event))
                 EventsManager.AddEventToEventDB(n_event, EventsManager.events)
                 event_count += 1
         return EventsManager.events
@@ -336,39 +335,26 @@ class EventsManager:
         if platform == 'darwin':
             filename = EventsManager.CreateICSFileFromInput(event)
             if filename == None:
-                #print(f'[{__name__}] FAILED TO CREATE ICS FILE FOR MAC')
                 logging.error(f'[{__name__}] FAILED TO CREATE ICS FILE FOR MAC')
                 return
             file = CalendarInterface.getICSFilePath(filename)
             def schedule_mac(): 
                 subprocess.run(['open', file])
-                #self.ScheduleActions(id=uuid4(), platform='Default')
-                schedule_cb(id=uuid4, platform='Default')
-            # popup_mgr.PopupWithBtn(pop_up_name='Warning',
-            #                        subtitle_1='Warning',
-            #                        subtitle_2='No checks for other events are done for this.\nAre you sure you want to schedule?',
-            #                        button_cb=schedule_mac)
+                schedule_cb(id=uuid4, platform=DEFAULT_CALENDAR)
+            return [], schedule_mac
         # Windows
         else:
-             def schedule_offline():
+            def schedule_offline():
                 filename = EventsManager.CreateICSFileFromInput(event)
                 if filename == None:
-                    #print(f'[{__name__}] FAILED TO CREATE ICS FILE FOR WINDOWS')
                     logging.error(f'[{__name__}] FAILED TO CREATE ICS FILE FOR WINDOWS')
                     return
                 file = CalendarInterface.getICSFilePath(filename)
                 os.startfile(file)
-                schedule_cb(id=0, platform='')
-
-            #  popup_mgr.PopupWithTwoBtns(pop_up_name='Default Windows Scheduling',
-            #                             subtitle_1='Warning!',
-            #                             subtitle_2='Choose schedulling type\nNote: Locally schedule events would not be save in this app.',
-            #                             button_cb_2=lambda:EventsManager.ScheduleOutlookCalendar(event, schedule_cb),
-            #                             button_cb_1=schedule_offline,
-            #                             b1_text="Local",
-            #                             b2_text='Outlook')
+                schedule_cb(id=0, platform=DEFAULT_CALENDAR)
+            return [], schedule_offline
             
-    def ScheduleGoogleCalendar(event, schedule_cb)->[str, list]:
+    def ScheduleGoogleCalendar(event, schedule_cb):
         filename = EventsManager.CreateICSFileFromInput(event)
         if filename == None:
             #print(f'[{__name__}] FAILED TO CREATE ICS FILE FOR GOOGLE')
@@ -385,21 +371,17 @@ class EventsManager:
         # Method to scheudle google event
         def schedule_google_calendar_event(): 
             id = GoogleCalendarInterface.ScheduleCalendarEvent(googleEvent=google_event)
-            # if id == '': popup_mgr.BasicPopup('Failed to schedule event for reasons')
-            # else: schedule_cb(id=id, platform='Google')#self.ScheduleActions(id=id, platform='Google')
+            if id == '': 
+                return ScheduleStatus.FAILED 
+            else: 
+                schedule_cb(id=id, platform=GOOGLE_CALENDAR)
+                return ScheduleStatus.SUCCESS
 
         # Handle clash of events
-        if len(overlapped_events) > 0:
-            names = [x.getEvent() for x in overlapped_events]
-            base_text = ''
-            for t in names: base_text += (t + '\n')
-            # popup_mgr.PopupWithBtn(pop_up_name='Event clash',
-            #                        subtitle_1='Are you sure you want to schedule this event?',
-            #                        subtitle_2='It clashes with the following events:',
-            #                        textbox_content=base_text, 
-            #                        button_cb=schedule_google_calendar_event)
-        else: schedule_google_calendar_event()
-
+        names = []
+        if len(overlapped_events) > 0: names = [x.getEvent() for x in overlapped_events]
+        return names, schedule_google_calendar_event
+             
     def ScheduleOutlookCalendar(event, schedule_cb)->str:
         filename = EventsManager.CreateICSFileFromInput(event)
         if filename == None:
@@ -412,33 +394,23 @@ class EventsManager:
         '$filter': f"start/dateTime ge {outlook_event['start']['dateTime']} and end/dateTime le {outlook_event['end']['dateTime']}"
         }
         cal_events ={}
-        try: cal_events = outlook_interface.send_flask_req('get_events', param_data=filter_param)[1]['value']
-        except: pass
-
-        # Response format
-        #(True, {'@odata.context': "", 'value': []})
-        if cal_events == {}: 
-            # popup_mgr.BasicPopup('Failed to schedule event for [OUTLOOK] due to failed authentication')
-            return ''
+        cal_events = outlook_interface.send_flask_req('get_events', param_data=filter_param)[1]['value']
 
         def schedule_outlook_calendar_event():
             response = outlook_interface.send_flask_req(req='create_event', 
                                                         json_data={'event': outlook_event})
             details = response[1]
-            # if 'id' not in details: popup_mgr.BasicPopup('Failed to schedule event for reasons')
-            # else: schedule_cb(id=details['id'], platform='Outlook')
+            if 'id' not in details: 
+                return ScheduleStatus.FAILED 
+            else: 
+                schedule_cb(id=details['id'], platform=OUTLOOK_CALENDAR)
+                return ScheduleStatus.SUCCESS
 
         # Cannot pass an entire dictionary as a param 
+        names = []
         if len(cal_events) > 0:
             names = [x['subject'] for x in cal_events]
-            base_text = ''
-            for t in names: base_text += (t + '\n')
-            # popup_mgr.PopupWithBtn(pop_up_name='Event clash',
-            #                        subtitle_1='Are you sure you want to schedule this event?',
-            #                        subtitle_2='It clashes with the following events:',
-            #                        textbox_content=base_text, 
-            #                        button_cb=schedule_outlook_calendar_event)
-        else: schedule_outlook_calendar_event()
+        return names, schedule_outlook_calendar_event
 
     # Creates ICS files to be parsed 
     # 1 ICS = should have 1 VEVENT

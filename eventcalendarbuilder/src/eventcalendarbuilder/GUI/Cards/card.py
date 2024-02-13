@@ -4,7 +4,7 @@ from toga.style.pack import COLUMN, ROW
 
 class Card():
     def __init__(self) -> None:
-        self.card = toga.Box(style=Pack(background_color = 'blue'))
+        self.card = toga.Box(style=Pack(background_color = 'grey'))
         self.content = toga.Box(style=Pack(direction=COLUMN, padding=10, flex=1))
         self.card.add(self.content)
 

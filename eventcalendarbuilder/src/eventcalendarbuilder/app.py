@@ -16,7 +16,7 @@ from eventcalendarbuilder.GUI.Pages.manage_event_page import ManageEventPage
 # GUI
 from eventcalendarbuilder.GUI.navbar import NavBar
 
-ENABLE_GOOGLE = False
+ENABLE_GOOGLE = True
 ENABLE_OUTLOOK = False
 
 class EventCalendarBuilder(toga.App):
@@ -55,7 +55,7 @@ class EventCalendarBuilder(toga.App):
 
         # Add the button box and content box to the main window
         split = toga.SplitContainer()
-        split.content = [(left_container, 1), (self.right_container, 3)]
+        split.content = [(left_container, 1), (self.right_container, 5)]
         self.main_window.content = split
 
         self.main_window.show()

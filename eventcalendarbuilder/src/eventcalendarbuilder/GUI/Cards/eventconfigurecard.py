@@ -33,20 +33,25 @@ class EventConfigureCard(Card):
         self.end_time_input.value = self.event.getEnd_Time()
 
         # MISC
-        self.priority = toga.Selection(items=['1', '2', '3', '4', '5'], style=Pack(padding=5))
-        self.calendar = toga.Selection(items=[DEFAULT_CALENDAR, GOOGLE_CALENDAR, OUTLOOK_CALENDAR], style=Pack(padding=5))
-        self.timezone = toga.Selection(items=pytz.all_timezones, style=Pack(padding=5))
-        self.timezone.value = "Asia/Singapore"
-        self.repeated = toga.Selection(items=[RecurrenceTypes.NONE.value, RecurrenceTypes.DAILY.value, RecurrenceTypes.WEEKLY.value, RecurrenceTypes.MONTHLY.value], style=Pack(padding=5))
-    
+        self.priority_input = toga.Selection(items=['1', '2', '3', '4', '5'], style=Pack(padding=5))
+        self.calendar_input = toga.Selection(items=[DEFAULT_CALENDAR, GOOGLE_CALENDAR, OUTLOOK_CALENDAR], style=Pack(padding=5))
+        self.timezone_input = toga.Selection(items=pytz.all_timezones, style=Pack(padding=5))
+        self.timezone_input.value = "Asia/Singapore"
+        self.repeated_input = toga.Selection(items=[RecurrenceTypes.NONE.value, RecurrenceTypes.DAILY.value, RecurrenceTypes.WEEKLY.value, RecurrenceTypes.MONTHLY.value], style=Pack(padding=5))
+
+        self.priority_container = toga.Box(children=[toga.Label('Priority:'), toga.Divider(direction=Direction.VERTICAL), self.priority_input], style=Pack(padding=5, alignment=CENTER))
+        self.calendar_container = toga.Box(children=[toga.Label('Calendar:'), toga.Divider(direction=Direction.VERTICAL), self.calendar_input], style=Pack(padding=5, alignment=CENTER))
+        self.timezone_container = toga.Box(children=[toga.Label('Timezone:'), toga.Divider(direction=Direction.VERTICAL), self.timezone_input], style=Pack(padding=5, alignment=CENTER))
+        self.repeated_container = toga.Box(children=[toga.Label('Repeated:'), toga.Divider(direction=Direction.VERTICAL), self.repeated_input], style=Pack(padding=5, alignment=CENTER))
+
         self.misc_label = toga.Label('Misc:')
         self.misc_container = toga.SplitContainer()
-        self.left_split = toga.Box(children=[self.priority, self.calendar], style=Pack(direction=COLUMN, padding_top=10))
-        self.right_split = toga.Box(children=[self.timezone, self.repeated], style=Pack(direction=COLUMN, padding_top=10))
+        self.left_split = toga.Box(children=[self.priority_container, self.calendar_container], style=Pack(direction=COLUMN, padding_top=10))
+        self.right_split = toga.Box(children=[self.timezone_container, self.repeated_container], style=Pack(direction=COLUMN, padding_top=10))
         self.misc_container.content = [(self.left_split, 1), (self.right_split, 1)]
 
         # SUBMIT BTN
-        self.submit_btn = toga.Button(text='Schedule', on_press=self.submit_event)
+        self.submit_btn = toga.Button(text='Schedule', on_press=self.submit_event, style=Pack(padding_top=10))
 
         # Add to card
         self.content.add(self.event_container)
@@ -87,10 +92,10 @@ class EventConfigureCard(Card):
             'End_Time' : self.end_time_input.value,
             'Start_Time_ICS': ics_s,
             'End_Time_ICS' : ics_e,
-            'Calendar' : self.calendar.value,
-            'Priority' : self.priority.value,
-            'Timezone' : self.timezone.value,
-            'Repeated' : self.repeated.value
+            'Calendar' : self.calendar_input.value,
+            'Priority' : self.priority_input.value,
+            'Timezone' : self.timezone_input.value,
+            'Repeated' : self.repeated_input.value
         }
     
     async def submit_event(self, widget):
@@ -99,13 +104,13 @@ class EventConfigureCard(Card):
         cb = None
         clash_text = ''
 
-        if self.calendar.value == DEFAULT_CALENDAR: 
+        if self.calendar_input.value == DEFAULT_CALENDAR: 
             self.default_confirm = await toga.Window().confirm_dialog(title='Warning!', message='You will not be able to manage default scheduled events, do you wish to proceed?')
             if self.default_confirm:
                 clash, cb = EventsManager.ScheduleDefault(input, schedule_cb=self.schedule_actions)# No clash checking done for default yet
-        elif self.calendar.value == GOOGLE_CALENDAR: 
+        elif self.calendar_input.value == GOOGLE_CALENDAR: 
             clash, cb = EventsManager.ScheduleGoogleCalendar(input, schedule_cb=self.schedule_actions)
-        elif self.calendar.value == OUTLOOK_CALENDAR: 
+        elif self.calendar_input.value == OUTLOOK_CALENDAR: 
             clash, cb = EventsManager.ScheduleOutlookCalendar(input, schedule_cb=self.schedule_actions)
         
         if len(clash) > 0:

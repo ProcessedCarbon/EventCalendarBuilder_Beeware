@@ -180,6 +180,7 @@ class EventsManager:
         Updates the local event db list by reading from the local events.json
         '''
         # Get event data from JSON
+        EventsManager.events_db = []
         data = directory_manager.ReadJSON(EventsManager.local_events_dir, EventsManager.event_json)
         if data == None:
             #print(f"[{__name__}]NO LOCALLLY SCHEDULED EVENTS")

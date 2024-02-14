@@ -8,6 +8,11 @@ from eventcalendarbuilder.PythonFiles.Calendar.calendar_constants import GOOGLE_
 from eventcalendarbuilder.PythonFiles.Managers.TextProcessing import TextProcessingManager
 from eventcalendarbuilder.PythonFiles.Events.EventsManager import EventsManager, Event
 import pytz
+from sys import platform
+import re
+
+DATE_PATTERN = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+TIME_PATTERN = re.compile(r'^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$')
 
 class EventConfigureCard(Card):
     def __init__(self, event: Event, remove_cb=None) -> None:
@@ -19,14 +24,23 @@ class EventConfigureCard(Card):
         self.event_container, self.event_input, self.event_label = self.labeled_input(label='Event', input=toga.MultilineTextInput(placeholder='Name of event', style=Pack(flex=1)))
         self.desc_container, self.desc_input, self.desc_label = self.labeled_input(label='Description', input=toga.MultilineTextInput(placeholder='Describe the event', style=Pack(flex=1)))
         self.loc_container, self.loc_input, self.loc_label = self.labeled_input(label='Location', input=toga.MultilineTextInput(placeholder='Location at where event is held', style=Pack(flex=1)))
-        self.start_date_container, self.start_date_input, self.start_date_label = self.labeled_input(label='Start Date', input=toga.DateInput(style=Pack(flex=1)))
-        self.end_date_container, self.end_date_input, self.end_date_label = self.labeled_input(label='End Date', input=toga.DateInput(style=Pack(flex=1)))
-        self.start_time_container, self.start_time_input, self.start_time_label = self.labeled_input(label='Start Time', input=toga.TimeInput(style=Pack(flex=1)))
-        self.end_time_container, self.end_time_input, self.end_time_label = self.labeled_input(label='End Time', input=toga.TimeInput(style=Pack(flex=1)))
+        
+        # temp: Only display datetime for windows
+        if platform == 'win32':
+            self.start_date_container, self.start_date_input, self.start_date_label = self.labeled_input(label='Start Date', input=toga.DateInput(style=Pack(flex=1)))
+            self.end_date_container, self.end_date_input, self.end_date_label = self.labeled_input(label='End Date', input=toga.DateInput(style=Pack(flex=1)))
+            self.start_time_container, self.start_time_input, self.start_time_label = self.labeled_input(label='Start Time', input=toga.TimeInput(style=Pack(flex=1)))
+            self.end_time_container, self.end_time_input, self.end_time_label = self.labeled_input(label='End Time', input=toga.TimeInput(style=Pack(flex=1)))
+        else:
+            self.start_date_container, self.start_date_input, self.start_date_label = self.labeled_input(label='Start Date', input=toga.TextInput(placeholder='YYYY-MM-DD',style=Pack(flex=1)))
+            self.end_date_container, self.end_date_input, self.end_date_label = self.labeled_input(label='End Date', input=toga.TextInput(placeholder='YYYY-MM-DD', style=Pack(flex=1)))
+            self.start_time_container, self.start_time_input, self.start_time_label = self.labeled_input(label='Start Time', input=toga.TextInput(placeholder='HH:MM:SS', style=Pack(flex=1)))
+            self.end_time_container, self.end_time_input, self.end_time_label = self.labeled_input(label='End Time', input=toga.TextInput(placeholder='HH:MM:SS', style=Pack(flex=1)))
 
         # Insert known values
         self.event_input.value = self.event.getName()
         self.loc_input.value = self.event.getLocation()
+
         self.start_date_input.value = self.event.get_S_Date()
         self.end_date_input.value = self.event.get_E_Date()
         self.start_time_input.value = self.event.getStart_Time()
@@ -77,9 +91,21 @@ class EventConfigureCard(Card):
         return labeled_input_container, input, label
     
     def get_all_values(self):
-        ics_s_date = TextProcessingManager.ProcessDateToICSFormat(str(self.start_date_input.value))
-        ics_e_date = TextProcessingManager.ProcessDateToICSFormat(str(self.end_date_input.value))
-        ics_time = TextProcessingManager.ProcessTimeToICSFormat([str(self.start_time_input.value), str(self.end_time_input.value)])
+        # Check format
+        start_date = str(self.start_date_input.value)
+        end_date = str(self.end_date_input.value)
+        start_time = str(self.start_time_input.value)
+        end_time = str(self.end_time_input.value)
+
+        if bool(DATE_PATTERN.match(start_date)) == False: return {}, 'Invalid Start Date!'
+        elif bool(DATE_PATTERN.match(end_date)) == False: return {}, 'Invalid End Date!'
+        elif bool(TIME_PATTERN.match(start_time)) == False: return {}, 'Invalid Start Time!'
+        elif bool(TIME_PATTERN.match(end_time)) == False: return {}, 'Invalid End Time!'
+        elif self.event_input.value == '' or self.event_input.value == ' ' or self.event_input.value == '\n': return {}, 'Missing Event Name!'
+
+        ics_s_date = TextProcessingManager.ProcessDateToICSFormat(start_date)
+        ics_e_date = TextProcessingManager.ProcessDateToICSFormat(end_date)
+        ics_time = TextProcessingManager.ProcessTimeToICSFormat([start_time, end_time])
         ics_s, ics_e = TextProcessingManager.ProcessICS(ics_s_date, ics_e_date, ics_time)
 
         return {
@@ -96,10 +122,15 @@ class EventConfigureCard(Card):
             'Priority' : self.priority_input.value,
             'Timezone' : self.timezone_input.value,
             'Repeated' : self.repeated_input.value
-        }
+        }, ''
     
     async def submit_event(self, widget):
-        input = self.get_all_values()
+        input, res = self.get_all_values()
+
+        if res != '':
+            toga.Window().error_dialog(title='Warning!', message=res)
+            return
+
         clash = None
         cb = None
         clash_text = ''
@@ -108,6 +139,7 @@ class EventConfigureCard(Card):
             self.default_confirm = await toga.Window().confirm_dialog(title='Warning!', message='You will not be able to manage default scheduled events, do you wish to proceed?')
             if self.default_confirm:
                 clash, cb = EventsManager.ScheduleDefault(input, schedule_cb=self.schedule_actions)# No clash checking done for default yet
+            else: return
         elif self.calendar_input.value == GOOGLE_CALENDAR: 
             clash, cb = EventsManager.ScheduleGoogleCalendar(input, schedule_cb=self.schedule_actions)
         elif self.calendar_input.value == OUTLOOK_CALENDAR: 

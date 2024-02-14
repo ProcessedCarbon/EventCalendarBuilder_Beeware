@@ -16,7 +16,8 @@ TIME_PATTERN = re.compile(r'^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$')
 
 class EventConfigureCard(Card):
     def __init__(self, event: Event, remove_cb=None) -> None:
-        super().__init__()
+        color = (platform=='win32') and 'grey' or 'transparent'
+        super().__init__(color=color)
         self.event = event
         self.remove_cb = remove_cb
 
@@ -105,9 +106,17 @@ class EventConfigureCard(Card):
         ics_time = TextProcessingManager.ProcessTimeToICSFormat([start_time, end_time])
         ics_s, ics_e = TextProcessingManager.ProcessICS(ics_s_date, ics_e_date, ics_time)
 
-        # Set event details only attainable from input
+        # Update event details only attainable from input
+        self.event.setName(self.event_input.value)
         self.event.setDescription(self.desc_input.value)
+        self.event.setLocation(self.loc_input.value)
+        self.event.set_S_Date(self.start_date_input.value)
+        self.event.set_E_Date(self.end_date_input.value)
+        self.event.setStart_Time(self.start_time_input.value)
+        self.event.setEnd_Time(self.end_time_input.value)
+        self.event.setPlatform(self.calendar_input.value)
         self.event.setTimezone(self.timezone_input.value)
+        self.event.setRecurring(self.repeated_input.value)
 
         return {
             'Event' : self.event_input.value,

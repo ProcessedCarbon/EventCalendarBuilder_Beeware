@@ -431,7 +431,6 @@ class EventsManager:
     # returns names of file created
     def CreateICSFileFromInput(event)->str:
         desp = event["Description"]
-        priority = int(event["Priority"])
         location = event["Location"]
         tz = event['Timezone']
         title = event["Event"]
@@ -454,7 +453,6 @@ class EventsManager:
                                                     s_datetime=ics_s,
                                                     e_datetime=ics_e,
                                                     e_location=location,
-                                                    e_priority=int(priority),
                                                     rrule=rrule,
                                                     duration=hours)
         

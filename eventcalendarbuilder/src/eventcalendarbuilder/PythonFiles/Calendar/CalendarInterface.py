@@ -24,7 +24,7 @@ class CalendarInterface:
         
     def CreateICSEvent(e_name, e_description, s_datetime, e_datetime,duration,
                     e_organizer_addr="", e_organizer_name="", e_organizer_role="",
-                    e_location="", e_priority=5, rrule={}, tz='Asia/Singapore'):
+                    e_location="", rrule={}, tz='Asia/Singapore'):
         
         # Add subcomponents
         event = Event()
@@ -55,7 +55,6 @@ class CalendarInterface:
         event['location'] = vText(e_location)
         
         event['uid'] = uuid.uuid4()
-        event.add('priority', e_priority)
 
         # Not handling attendees for now
         # attendee = vCalAddress('MAILTO:rdoe@example.com')

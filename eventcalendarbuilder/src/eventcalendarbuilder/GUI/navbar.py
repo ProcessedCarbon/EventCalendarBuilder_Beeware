@@ -12,7 +12,7 @@ class NavBar():
             return
         
         for b in buttons:
-            self.content.add(toga.Button(b, on_press=buttons[b], style=Pack(padding_top=10)))
+            self.content.add(toga.Button(b, on_press=buttons[b], style=Pack(padding=10)))
     
     def get_navbar(self):
         return self.content

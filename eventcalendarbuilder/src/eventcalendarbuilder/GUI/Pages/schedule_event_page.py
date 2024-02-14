@@ -46,8 +46,8 @@ class ScheduleEventPage(Page):
             self.result_content.add(card.get_card())
             self.result_content.add(toga.Divider())
 
-    def on_remove(self):
-        super().on_remove()
+    def on_exit(self):
+        super().on_exit()
         self.input.value = ''
     
     def remove_card(self, card=None):

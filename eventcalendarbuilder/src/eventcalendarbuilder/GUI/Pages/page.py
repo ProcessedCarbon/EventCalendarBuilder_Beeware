@@ -9,5 +9,8 @@ class Page():
     def getPage(self):
         return self.page_box
     
-    def on_remove(self):
+    def on_exit(self):
+        pass
+
+    def on_enter(self):
         pass

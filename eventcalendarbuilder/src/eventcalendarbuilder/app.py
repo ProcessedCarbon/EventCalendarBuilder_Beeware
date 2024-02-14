@@ -61,9 +61,10 @@ class EventCalendarBuilder(toga.App):
         self.main_window.show()
 
     def show_page(self, page_number):
-        self.current_page.on_remove()
+        self.current_page.on_exit()
         self.right_container.content.remove(self.current_page.getPage())
         self.current_page = self.pages[page_number]
+        self.current_page.on_enter()
         self.right_container.content.add(self.current_page.getPage())
 
 def main():

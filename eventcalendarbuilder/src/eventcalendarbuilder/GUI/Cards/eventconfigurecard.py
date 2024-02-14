@@ -40,7 +40,6 @@ class EventConfigureCard(Card):
         # Insert known values
         self.event_input.value = self.event.getName()
         self.loc_input.value = self.event.getLocation()
-
         self.start_date_input.value = self.event.get_S_Date()
         self.end_date_input.value = self.event.get_E_Date()
         self.start_time_input.value = self.event.getStart_Time()
@@ -107,6 +106,9 @@ class EventConfigureCard(Card):
         ics_e_date = TextProcessingManager.ProcessDateToICSFormat(end_date)
         ics_time = TextProcessingManager.ProcessTimeToICSFormat([start_time, end_time])
         ics_s, ics_e = TextProcessingManager.ProcessICS(ics_s_date, ics_e_date, ics_time)
+
+        # Set description from input
+        self.event.setDescription(self.desc_input.value)
 
         return {
             'Event' : self.event_input.value,

@@ -232,6 +232,7 @@ class EventsManager:
         event_dict = event.getEventDict()
         event_dict['object'] = event
         target.append(event_dict)
+        EventsManager.WriteEventDBToJSON()
     
     def RemoveFromEventDB(id:str, target=None)->bool:
         if target == None:
@@ -243,6 +244,7 @@ class EventsManager:
             if e['id'] == id:
                 print(f'found: {e["id"]}')
                 target.remove(e)
+                EventsManager.WriteEventDBToJSON()
                 return True
             
         logging.warning(f"[{__name__}] REMOVE TARGET NOT FOUND!")

@@ -2,12 +2,12 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW, CENTER
 
-from eventcalendarbuilder.GUI.Pages.page import Page
 from eventcalendarbuilder.PythonFiles.NER.NERInterface import NERInterface
 from eventcalendarbuilder.PythonFiles.Events.EventsManager import EventsManager
-from eventcalendarbuilder.GUI.Cards.eventconfigurecard import EventConfigureCard
+from eventcalendarbuilder.PythonFiles.Calendar.CalendarInterface import CalendarInterface
 
-DEFAULT_RESULT_TEXT = 'Output: '
+from eventcalendarbuilder.GUI.Pages.page import Page
+from eventcalendarbuilder.GUI.Cards.eventconfigurecard import EventConfigureCard
 
 class ScheduleEventPage(Page):
     def __init__(self):
@@ -50,8 +50,12 @@ class ScheduleEventPage(Page):
         super().on_exit()
         self.input.value = ''
         EventsManager.ClearEvents()
+
         for c in list(self.result_content.children):
             self.result_content.remove(c)
+
+        # Clear local ICS files
+        CalendarInterface.DeleteICSFilesInDir(CalendarInterface._main_dir)
     
     def remove_card(self, card=None):
         if card == None: return

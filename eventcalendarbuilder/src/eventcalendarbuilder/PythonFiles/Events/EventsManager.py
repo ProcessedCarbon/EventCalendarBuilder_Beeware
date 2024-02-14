@@ -16,15 +16,16 @@ import logging
 
 class Event:
     def __init__(self, 
-                 id:str, 
-                 name:str, 
-                 location:str, 
-                 s_date:str, 
-                 e_date:str,
-                 start_time:str, 
-                 end_time:str,
-                 platform='Default',
-                 recurring='None') -> None:
+                id:str, 
+                name:str, 
+                location:str, 
+                s_date:str, 
+                e_date:str,
+                start_time:str, 
+                end_time:str,
+                description:str,
+                platform='Default',
+                recurring='None') -> None:
         
         self.id = id
         self.name = name
@@ -35,6 +36,7 @@ class Event:
         self.end_time = end_time
         self.platform = platform
         self.recurring = recurring
+        self.description = description
     
     def getId(self)->str:
         return self.id
@@ -63,11 +65,15 @@ class Event:
     def getRecurring(self)->str:
         return self.recurring
 
+    def getDescription(self)->str:
+        return self.description
+
     def getEventDict(self):
         return {
             "id" : self.id,
             "name" : self.name,
             "location" : self.location,
+            "description" : self.description,
             "s_date" : self.s_date,
             "e_date" : self.e_date,
             "start_time" : self.start_time,
@@ -102,6 +108,9 @@ class Event:
     
     def setRecurring(self, recur:str):
         self.recurring = recur
+    
+    def setDescription(self, desc:str):
+        self.description = desc
 
 class EventsManager:
     # Directories
@@ -124,19 +133,21 @@ class EventsManager:
                     e_date:str,                       
                     start_time:str, 
                     end_time:str,
+                    description:str,
                     platform='Default',
                     id='None',
                     recurring='None'):
         
         return Event(id=id,
-                     name=name,
-                     location=location,
-                     s_date=s_date,
-                     e_date=e_date,
-                     start_time=start_time,
-                     end_time=end_time,
-                     platform=platform,
-                     recurring=recurring)
+                    name=name,
+                    location=location,
+                    s_date=s_date,
+                    e_date=e_date,
+                    start_time=start_time,
+                    end_time=end_time,
+                    platform=platform,
+                    recurring=recurring,
+                    description=description)
         
     def PrintEvents(events : dict):
         event = events['object']
@@ -173,7 +184,8 @@ class EventsManager:
                                                 start_time=d['start_time'],
                                                 end_time=d['end_time'],
                                                 platform=d['platform'],
-                                                recurring=d['recurring'])
+                                                recurring=d['recurring'],
+                                                description=d['description'])
             EventsManager.AddEventToEventDB(event=event, target=EventsManager.events_db)
 
     # Send only those that are schedule
@@ -298,7 +310,8 @@ class EventsManager:
                                                             s_date=start_date,
                                                             e_date=start_date,
                                                             start_time=start_time,
-                                                            end_time=end_time)
+                                                            end_time=end_time,
+                                                            description='')
                     #print(vars(n_event))
                     EventsManager.AddEventToEventDB(n_event, EventsManager.events)
                     event_count += 1
@@ -324,7 +337,8 @@ class EventsManager:
                                                     e_date=end_date,
                                                     start_time=start_time,
                                                     end_time=end_time,
-                                                    recurring=recurring)
+                                                    recurring=recurring,
+                                                    description='')
                 EventsManager.AddEventToEventDB(n_event, EventsManager.events)
                 event_count += 1
         return EventsManager.events
@@ -381,7 +395,7 @@ class EventsManager:
         names = []
         if len(overlapped_events) > 0: names = [x.getEvent() for x in overlapped_events]
         return names, schedule_google_calendar_event
-             
+
     def ScheduleOutlookCalendar(event, schedule_cb)->str:
         filename = EventsManager.CreateICSFileFromInput(event)
         if filename == None:

@@ -1,18 +1,19 @@
 class GoogleEvent:
     def __init__(self, event: str, 
-                 location: str, 
-                 start_datetime: str, 
-                 end_datetime: str, 
-                 tzstart: str, 
-                 tzend:str, 
-                 rrule:str,
-                 colorId=1,
-                 ):
+                location: str, 
+                start_datetime: str, 
+                end_datetime: str, 
+                tzstart: str, 
+                tzend:str, 
+                rrule:str,
+                description:str,
+                colorId=1,
+                ):
         
         self.event = {
             "summary" : event,
             "location" : location,
-            "description" : "Test description",
+            "description" : description,
             "colorId" : colorId,
             "start" : {
                 "dateTime" : start_datetime,
@@ -81,3 +82,6 @@ class GoogleEvent:
         else:
             #print('NO UNTIL DATE IN RRULE')
             return self.getEndDate()
+    
+    def getDesc(self)->str:
+        return self.event['description']

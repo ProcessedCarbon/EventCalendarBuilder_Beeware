@@ -24,8 +24,8 @@ token_path = directory_manager.getCurrentFileDirectory(__file__)
 # https://learn.microsoft.com/en-us/graph/api/calendar-post-events?view=graph-rest-1.0&tabs=http
 class OutlookEvent():
     def __init__(self, 
-                 name:str, location:str,  dtstart:str, rrule:str,
-                 dtend:str, tzstart:str, tzend:str, isonline=False) -> None:
+                name:str, location:str,  dtstart:str, rrule:str, description:str,
+                dtend:str, tzstart:str, tzend:str, isonline=False) -> None:
         
         self.name = name
         self.location = location
@@ -35,12 +35,13 @@ class OutlookEvent():
         self.tzend = tzend
         self.isonline = isonline
         self.rrule = rrule
+        self.description = description
         
         self.event = {
             "subject": name,
             "body": {
                 "contentType": "HTML",
-                "content": ""
+                "content": description
             },
             "start": {
                 "dateTime": dtstart,
@@ -124,6 +125,8 @@ class OutlookEvent():
                 "endDate": end_date
             }
         }
+    def getDesc(self):
+        return self.description
 
 @app.route('/')
 def login():
@@ -255,6 +258,7 @@ def parse_ics(ics)->OutlookEvent:
                                 dtend=e_dt.isoformat(),
                                 tzstart='UTC',
                                 tzend='UTC',
+                                description=component.get('description'),
                                 rrule=rule
                                 )
     return None

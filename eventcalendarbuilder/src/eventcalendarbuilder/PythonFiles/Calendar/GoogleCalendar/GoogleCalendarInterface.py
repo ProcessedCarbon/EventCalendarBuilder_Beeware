@@ -106,7 +106,7 @@ class GoogleCalendarInterface:
         return new_event['id']
 
     # Creates event datatype
-    def CreateGoogleEvent(title:str, location:str,  dtstart:str, dtend:str, tzstart:str, tzend:str, rrule:str, colorId=1):
+    def CreateGoogleEvent(title:str, location:str,  dtstart:str, dtend:str, tzstart:str, tzend:str, rrule:str, description:str ,colorId=1):
         """
         Returns the google calendar event format with the given entities in placed to be used to parsed to create a new event on google calendars
         https://developers.google.com/calendar/api/v3/reference/events
@@ -126,14 +126,14 @@ class GoogleCalendarInterface:
                             colorId=colorId,
                             tzstart=tzstart,
                             tzend=tzend,
+                            description=description,
                             rrule=rrule
-                           )
+                        )
 
     # Only expecting 1 event per ics
     def Parse_ICS(ics:str):
         if GoogleCalendarInterface.service == None:
-            #print(f"[{__name__}] MISSING CONNECTION TO GOOGLE CALENDARS, PLEASE CONNECT TO GOOGLE CALENDARS FIRST")
-            logging.warning(f"[{__name__}] INVALID EVENT OF GIVEN {type(googleEvent)}, LOOKING FOR - {GoogleEvent}")
+            logging.warning(f"[{__name__}] MISSING CONNECTION TO GOOGLE CALENDARS, PLEASE CONNECT TO GOOGLE CALENDARS FIRST")
             return
         
         ics_file = CalendarInterface.ReadICSFile(ics)
@@ -151,6 +151,7 @@ class GoogleCalendarInterface:
                                                                 dtend=end_datetime,
                                                                 tzstart=tzstart,
                                                                 tzend=tzend,
+                                                                description=component.get('description'),
                                                                 rrule=str(rule) if rule != '' else [],
                                                                 )
         return None
@@ -165,6 +166,7 @@ class GoogleCalendarInterface:
                                                                             tzstart=x['start']['timeZone'],
                                                                             dtend=x['end']['dateTime'],
                                                                             tzend=x['end']['timeZone'],
+                                                                            description=x['description'],
                                                                             rrule=x['recurrence'] if 'recurrence' in x else ''
                                                                         ) for x in existing]
         return existing_google_events  
@@ -187,7 +189,6 @@ class GoogleCalendarInterface:
     
     def DeleteEvent(id:str)->[bool,str]:
         if GoogleCalendarInterface.service == None:
-            #print(f"[{__name__}] MISSING CONNECTION TO GOOGLE CALENDARS, PLEASE CONNECT TO GOOGLE CALENDARS FIRST")
             logging.warning(f"[{__name__}] MISSING CONNECTION TO GOOGLE CALENDARS, PLEASE CONNECT TO GOOGLE CALENDARS FIRST")
             return False,''
         

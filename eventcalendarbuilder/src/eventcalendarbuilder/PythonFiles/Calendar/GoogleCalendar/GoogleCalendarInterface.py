@@ -166,7 +166,7 @@ class GoogleCalendarInterface:
                                                                             tzstart=x['start']['timeZone'],
                                                                             dtend=x['end']['dateTime'],
                                                                             tzend=x['end']['timeZone'],
-                                                                            description=x['description'],
+                                                                            description=x['description'] if 'description' in x else '',
                                                                             rrule=x['recurrence'] if 'recurrence' in x else ''
                                                                         ) for x in existing]
         return existing_google_events  

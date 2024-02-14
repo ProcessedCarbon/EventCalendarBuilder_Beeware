@@ -7,6 +7,7 @@ from eventcalendarbuilder.GUI.Cards.card import Card
 from eventcalendarbuilder.PythonFiles.Calendar.calendar_constants import GOOGLE_CALENDAR, OUTLOOK_CALENDAR, DEFAULT_CALENDAR, RecurrenceTypes, ScheduleStatus
 from eventcalendarbuilder.PythonFiles.Managers.TextProcessing import TextProcessingManager
 from eventcalendarbuilder.PythonFiles.Events.EventsManager import EventsManager, Event
+
 import pytz
 from sys import platform
 import re

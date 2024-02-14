@@ -105,8 +105,9 @@ class EventConfigureCard(Card):
         ics_time = TextProcessingManager.ProcessTimeToICSFormat([start_time, end_time])
         ics_s, ics_e = TextProcessingManager.ProcessICS(ics_s_date, ics_e_date, ics_time)
 
-        # Set description from input
+        # Set event details only attainable from input
         self.event.setDescription(self.desc_input.value)
+        self.event.setTimezone(self.timezone_input.value)
 
         return {
             'Event' : self.event_input.value,

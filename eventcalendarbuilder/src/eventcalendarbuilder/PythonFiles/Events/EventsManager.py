@@ -24,6 +24,7 @@ class Event:
                 start_time:str, 
                 end_time:str,
                 description:str,
+                timezone:str,
                 platform='Default',
                 recurring='None') -> None:
         
@@ -37,6 +38,7 @@ class Event:
         self.platform = platform
         self.recurring = recurring
         self.description = description
+        self.timezone = timezone
     
     def getId(self)->str:
         return self.id
@@ -68,6 +70,9 @@ class Event:
     def getDescription(self)->str:
         return self.description
 
+    def getTimeZone(self)->str:
+        return self.timezone
+
     def getEventDict(self):
         return {
             "id" : self.id,
@@ -79,7 +84,8 @@ class Event:
             "start_time" : self.start_time,
             "end_time" : self.end_time,
             "platform" : self.platform,
-            'recurring':self.recurring
+            'recurring': self.recurring,
+            'timezone' : self.timezone
         }
     
     def setId(self, id:str):
@@ -111,6 +117,9 @@ class Event:
     
     def setDescription(self, desc:str):
         self.description = desc
+    
+    def setTimezone(self, tz:str):
+        self.timezone = tz
 
 class EventsManager:
     # Directories
@@ -134,6 +143,7 @@ class EventsManager:
                     start_time:str, 
                     end_time:str,
                     description:str,
+                    timezone='Asia/Singapore',
                     platform='Default',
                     id='None',
                     recurring='None'):
@@ -147,7 +157,8 @@ class EventsManager:
                     end_time=end_time,
                     platform=platform,
                     recurring=recurring,
-                    description=description)
+                    description=description,
+                    timezone=timezone)
         
     def PrintEvents(events : dict):
         event = events['object']
@@ -354,7 +365,7 @@ class EventsManager:
             file = CalendarInterface.getICSFilePath(filename)
             def schedule_mac(): 
                 subprocess.run(['open', file])
-                schedule_cb(id=uuid4, platform=DEFAULT_CALENDAR)
+                schedule_cb(id=uuid4(), platform=DEFAULT_CALENDAR)
             return [], schedule_mac
         # Windows
         else:
@@ -444,7 +455,7 @@ class EventsManager:
         hours, remainder = divmod(time_difference.seconds, 3600)
 
         rrule = {'freq': event["Repeated"].lower(),
-                 'until': ics_e,
+                'until': ics_e,
                 } if event['Repeated'] != 'None' else {}
         
         # Create ICS File

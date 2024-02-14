@@ -26,13 +26,17 @@ class ManageEventPage(Page):
 
         # Get events from events db
         events = EventsManager.events_db
-        print(events)
         if len(events) > 0:
             for data in EventsManager.events_db:
                 card = EventDisplayCard(event=data, remove_cb=self.remove_card) # json read as a string for each value
                 self.event_content.add(card.get_card())
                 self.event_content.add(toga.Divider())
     
+    def on_exit(self):
+        super().on_exit()
+        for c in list(self.event_content.children):
+            self.event_content.remove(c)
+
     def remove_card(self, card=None):
         if card == None: return
         self.event_content.remove(card)        

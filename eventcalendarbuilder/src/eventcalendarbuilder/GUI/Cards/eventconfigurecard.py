@@ -166,6 +166,5 @@ class EventConfigureCard(Card):
             self.event.setPlatform(platform)
             self.event.setId(id)
             EventsManager.AddEventToEventDB(self.event, EventsManager.events_db)
-            EventsManager.WriteEventDBToJSON()
             toga.Window().info_dialog(title='Success!', message="Successfully scheduled the event!")
         self.remove_cb(card=self.card)

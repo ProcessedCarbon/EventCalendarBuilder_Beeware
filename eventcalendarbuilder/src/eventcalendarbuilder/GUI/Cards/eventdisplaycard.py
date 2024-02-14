@@ -9,6 +9,7 @@ from eventcalendarbuilder.PythonFiles.Calendar.calendar_constants import DEFAULT
 from eventcalendarbuilder.PythonFiles.Calendar.GoogleCalendar.GoogleCalendarInterface import GoogleCalendarInterface
 import eventcalendarbuilder.PythonFiles.Calendar.Outlook.OutlookInterface as outlook_interface
 import eventcalendarbuilder.PythonFiles.Calendar.CalendarMacInterface as calendarmac_interface
+from eventcalendarbuilder.PythonFiles.Events.EventsManager import EventsManager
 
 from sys import platform
 
@@ -71,6 +72,7 @@ class EventDisplayCard(Card):
 
         if self.delete_confirm:
             res = self.remove_event(calendar=self.platform)
+            EventsManager.RemoveFromEventDB(id=self.id, target=EventsManager.events_db)
 
             if res != '': toga.Window().error_dialog(title='Warning!', message=res) # There is an error show error
             else : toga.Window().info_dialog(title='Done!', message=f'Successful deletion of {self.name} event on {self.platform} calendar')

@@ -26,7 +26,7 @@ class ScheduleEventPage(Page):
 
     def get_entities_from_input(self, widget):
         # Clear local events list
-        EventsManager.events = []
+        EventsManager.ClearEvents()
         for c in list(self.result_content.children):
             self.result_content.remove(c)
 
@@ -49,6 +49,9 @@ class ScheduleEventPage(Page):
     def on_exit(self):
         super().on_exit()
         self.input.value = ''
+        EventsManager.ClearEvents()
+        for c in list(self.result_content.children):
+            self.result_content.remove(c)
     
     def remove_card(self, card=None):
         if card == None: return

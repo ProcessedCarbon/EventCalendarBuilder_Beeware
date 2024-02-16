@@ -8,12 +8,13 @@ from toga.style.pack import COLUMN, ROW
 # Custom modules
 from eventcalendarbuilder.PythonFiles.Calendar.GoogleCalendar.GoogleCalendarInterface import GoogleCalendarInterface
 import eventcalendarbuilder.PythonFiles.Calendar.Outlook.OutlookInterface as outlook_interface
+from eventcalendarbuilder.PythonFiles.Calendar.CalendarInterface import CalendarInterface
 
-# Pages
+# Custom Pages
 from eventcalendarbuilder.GUI.Pages.schedule_event_page import ScheduleEventPage
 from eventcalendarbuilder.GUI.Pages.manage_event_page import ManageEventPage
 
-# GUI
+# Custom GUI
 from eventcalendarbuilder.GUI.navbar import NavBar
 
 ENABLE_GOOGLE = False
@@ -27,6 +28,9 @@ class EventCalendarBuilder(toga.App):
         We then create a main window (with a name matching the app), and
         show the main window.
         """
+        # Add on exit cb
+        self.on_exit = self.quit
+
         # APIs
         if ENABLE_GOOGLE: GoogleCalendarInterface.ConnectToGoogleCalendar()
         if ENABLE_OUTLOOK: outlook_interface.start_flask()
@@ -66,6 +70,10 @@ class EventCalendarBuilder(toga.App):
         self.current_page = self.pages[page_number]
         self.current_page.on_enter()
         self.right_container.content.add(self.current_page.getPage())
+    
+    def quit(self, app):
+        CalendarInterface.DeleteICSFilesInDir(CalendarInterface._main_dir)
+        self.exit()
 
 def main():
     return EventCalendarBuilder()

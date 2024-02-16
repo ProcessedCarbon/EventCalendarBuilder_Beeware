@@ -18,9 +18,8 @@ TIME_PATTERN = re.compile(r'^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$')
 class EventConfigureCard(Card):
     def __init__(self, event: Event, parent) -> None:
         color = (platform=='win32') and 'grey' or 'transparent'
-        super().__init__(color=color)
+        super().__init__(color=color, parent=parent)
         self.event = event
-        self.parent = parent
 
         # MAIN
         self.event_container, self.event_input, self.event_label = self.labeled_input(label='Event', input=toga.MultilineTextInput(placeholder='Name of event', style=Pack(flex=1)))
@@ -65,7 +64,7 @@ class EventConfigureCard(Card):
 
         # BTNS
         self.submit_btn = toga.Button(text='Schedule', on_press=self.submit_event, style=Pack(flex=1))
-        self.remove_btn = toga.Button(text='Remove', on_press=lambda widget: self.remove_from(self.parent), style=Pack(flex=1))
+        self.remove_btn = toga.Button(text='Remove', on_press=self.ask_before_remove, style=Pack(flex=1))
         self.btn_container = toga.Box(children=[self.submit_btn, toga.Divider(style=Pack(padding=10)), self.remove_btn], style=Pack(flex=1, padding=10))
         
         # Add to card
@@ -170,4 +169,4 @@ class EventConfigureCard(Card):
             self.event.setId(id)
             EventsManager.AddEventToEventDB(self.event, EventsManager.events_db)
             toga.Window().info_dialog(title='Success!', message="Successfully scheduled the event!")
-        self.remove_from(self.parent)
+        self.remove_from()

@@ -19,10 +19,10 @@ class ScheduleEventPage(Page):
         self.result_content = toga.Box(style=Pack(direction=COLUMN, padding_top=10))
         self.result_container.content = self.result_content
 
-        self.page_box.add(self.title)
-        self.page_box.add(self.input)
-        self.page_box.add(self.get_entities_btn)
-        self.page_box.add(self.result_container)
+        self.content.add(self.title)
+        self.content.add(self.input)
+        self.content.add(self.get_entities_btn)
+        self.content.add(self.result_container)
 
     def get_entities_from_input(self, widget):
         # Clear local events list

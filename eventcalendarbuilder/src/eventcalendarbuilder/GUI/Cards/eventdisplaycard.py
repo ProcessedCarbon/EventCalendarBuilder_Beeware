@@ -14,12 +14,11 @@ from eventcalendarbuilder.PythonFiles.Events.EventsManager import EventsManager
 from sys import platform
 
 class EventDisplayCard(Card):
-    def __init__(self, event:dict, remove_cb) -> None:
-        super().__init__(color='grey')
+    def __init__(self, event:dict, parent) -> None:
+        super().__init__(color='grey', parent=parent)
         self.platform = event['platform']
         self.id = event['id']
         self.name = event['name']
-        self.remove_cb = remove_cb
 
         # MAIN
         self.event_container, self.event_input, self.event_label = self.labeled_input(label='Event', input=toga.MultilineTextInput(value=self.name, style=Pack(flex=1), readonly=True))
@@ -77,7 +76,7 @@ class EventDisplayCard(Card):
             if res != '': toga.Window().error_dialog(title='Warning!', message=res) # There is an error show error
             else : toga.Window().info_dialog(title='Done!', message=f'Successful deletion of {self.name} event on {self.platform} calendar')
 
-            self.remove_cb(card=self.card)
+            self.remove_from()
         else: return
 
     def remove_event(self, calendar):

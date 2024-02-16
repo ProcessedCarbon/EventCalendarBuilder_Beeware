@@ -63,9 +63,11 @@ class EventConfigureCard(Card):
         self.right_split = toga.Box(children=[self.timezone_container, self.repeated_container], style=Pack(direction=COLUMN, padding_top=10))
         self.misc_container.content = [(self.left_split, 1), (self.right_split, 1)]
 
-        # SUBMIT BTN
-        self.submit_btn = toga.Button(text='Schedule', on_press=self.submit_event, style=Pack(padding_top=10))
-
+        # BTNS
+        self.submit_btn = toga.Button(text='Schedule', on_press=self.submit_event, style=Pack(flex=1))
+        self.remove_btn = toga.Button(text='Remove', on_press=lambda widget: self.remove_from(self.parent), style=Pack(flex=1))
+        self.btn_container = toga.Box(children=[self.submit_btn, toga.Divider(style=Pack(padding=10)), self.remove_btn], style=Pack(flex=1, padding=10))
+        
         # Add to card
         self.content.add(self.event_container)
         self.content.add(self.desc_container)
@@ -76,7 +78,7 @@ class EventConfigureCard(Card):
         self.content.add(self.end_time_container)
         self.content.add(self.misc_label)
         self.content.add(self.misc_container)
-        self.content.add(self.submit_btn)
+        self.content.add(self.btn_container)
 
     def labeled_input(self, label, input):
         # Container

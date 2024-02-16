@@ -358,7 +358,7 @@ class EventsManager:
         return EventsManager.events
     
     # Right now can only handle 1 event only 
-    def ScheduleDefault(event, schedule_cb):
+    def ScheduleDefault(event):
         # Mac
         if platform == 'darwin':
             filename = EventsManager.CreateICSFileFromInput(event)
@@ -368,7 +368,6 @@ class EventsManager:
             file = CalendarInterface.getICSFilePath(filename)
             def schedule_mac(): 
                 subprocess.run(['open', file])
-                schedule_cb(id=uuid4(), platform=DEFAULT_CALENDAR)
             return [], schedule_mac
         # Windows
         else:
@@ -379,7 +378,6 @@ class EventsManager:
                     return
                 file = CalendarInterface.getICSFilePath(filename)
                 os.startfile(file)
-                schedule_cb(id=0, platform=DEFAULT_CALENDAR)
             return [], schedule_offline
             
     def ScheduleGoogleCalendar(event, schedule_cb):

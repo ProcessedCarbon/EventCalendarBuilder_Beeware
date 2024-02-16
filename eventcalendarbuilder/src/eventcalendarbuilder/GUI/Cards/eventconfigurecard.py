@@ -148,7 +148,7 @@ class EventConfigureCard(Card):
         if self.calendar_input.value == DEFAULT_CALENDAR: 
             self.default_confirm = await toga.Window().confirm_dialog(title='Warning!', message='You will not be able to manage default scheduled events, do you wish to proceed?')
             if self.default_confirm:
-                clash, cb = EventsManager.ScheduleDefault(input, schedule_cb=self.schedule_actions)# No clash checking done for default yet
+                clash, cb = EventsManager.ScheduleDefault(input)# No clash checking done for default yet
             else: return
         elif self.calendar_input.value == GOOGLE_CALENDAR: 
             clash, cb = EventsManager.ScheduleGoogleCalendar(input, schedule_cb=self.schedule_actions)

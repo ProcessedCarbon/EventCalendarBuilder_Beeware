@@ -42,7 +42,7 @@ class ScheduleEventPage(Page):
         added_events = EventsManager.AddEvents(events=p_events)
         
         for e in added_events:
-            card = EventConfigureCard(event=e['object'], remove_cb=self.remove_card)
+            card = EventConfigureCard(event=e['object'], parent=self.result_content)
             self.result_content.add(card.get_card())
             self.result_content.add(toga.Divider())
 
@@ -56,7 +56,3 @@ class ScheduleEventPage(Page):
 
         # Clear local ICS files
         CalendarInterface.DeleteICSFilesInDir(CalendarInterface._main_dir)
-    
-    def remove_card(self, card=None):
-        if card == None: return
-        self.result_content.remove(card)

@@ -16,3 +16,6 @@ class Card():
     
     def on_remove(self):
         pass
+
+    def remove_from(self, widget_to_remove_from):
+        widget_to_remove_from.remove(self.card)

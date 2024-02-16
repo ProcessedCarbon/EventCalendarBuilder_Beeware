@@ -16,11 +16,11 @@ DATE_PATTERN = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 TIME_PATTERN = re.compile(r'^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$')
 
 class EventConfigureCard(Card):
-    def __init__(self, event: Event, remove_cb=None) -> None:
+    def __init__(self, event: Event, parent) -> None:
         color = (platform=='win32') and 'grey' or 'transparent'
         super().__init__(color=color)
         self.event = event
-        self.remove_cb = remove_cb
+        self.parent = parent
 
         # MAIN
         self.event_container, self.event_input, self.event_label = self.labeled_input(label='Event', input=toga.MultilineTextInput(placeholder='Name of event', style=Pack(flex=1)))
@@ -168,4 +168,4 @@ class EventConfigureCard(Card):
             self.event.setId(id)
             EventsManager.AddEventToEventDB(self.event, EventsManager.events_db)
             toga.Window().info_dialog(title='Success!', message="Successfully scheduled the event!")
-        self.remove_cb(card=self.card)
+        self.remove_from(self.parent)

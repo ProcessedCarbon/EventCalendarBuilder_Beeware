@@ -16,7 +16,7 @@ from eventcalendarbuilder.GUI.Pages.manage_event_page import ManageEventPage
 # GUI
 from eventcalendarbuilder.GUI.navbar import NavBar
 
-ENABLE_GOOGLE = False
+ENABLE_GOOGLE = True
 ENABLE_OUTLOOK = False
 
 class EventCalendarBuilder(toga.App):

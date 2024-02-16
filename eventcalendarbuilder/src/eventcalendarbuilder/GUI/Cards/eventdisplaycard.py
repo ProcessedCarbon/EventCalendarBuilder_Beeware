@@ -81,7 +81,7 @@ class EventDisplayCard(Card):
         else: return
 
     def remove_event(self, calendar):
-        if calendar == DEFAULT_CALENDAR: # not supported (16 Feb 2024)
+        if calendar == DEFAULT_CALENDAR: # not supported for now
             try:
                 if platform == 'darwin': calendarmac_interface.RemoveMacCalendarEvents(self.name)
                 else: self.remove_outlook()

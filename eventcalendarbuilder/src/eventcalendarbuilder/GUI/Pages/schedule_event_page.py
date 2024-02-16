@@ -14,7 +14,7 @@ class ScheduleEventPage(Page):
         super().__init__()
         self.title = toga.Label('Schedule Page', style=Pack(text_align=CENTER))
         self.input = toga.MultilineTextInput(style=Pack(padding_top=10, height=200))
-        self.get_entities_btn = toga.Button('Click me', on_press=self.get_entities_from_input, style=Pack(padding_top=10))
+        self.get_entities_btn = toga.Button('Find events', on_press=self.get_entities_from_input, style=Pack(padding_top=10))
         self.result_container = toga.ScrollContainer(horizontal=False, style=Pack(flex=1))
         self.result_content = toga.Box(style=Pack(direction=COLUMN, padding_top=10))
         self.result_container.content = self.result_content

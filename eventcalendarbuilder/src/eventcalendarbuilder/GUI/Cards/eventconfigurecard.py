@@ -163,7 +163,7 @@ class EventConfigureCard(Card):
         else: cb()
 
     def schedule_actions(self, id, platform=DEFAULT_CALENDAR):
-        if platform != '':
+        if platform != DEFAULT_CALENDAR:
             self.event.setPlatform(platform)
             self.event.setId(id)
             EventsManager.AddEventToEventDB(self.event, EventsManager.events_db)

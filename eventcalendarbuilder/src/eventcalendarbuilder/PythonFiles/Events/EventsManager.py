@@ -1,5 +1,4 @@
 import subprocess
-from uuid import uuid4
 from eventcalendarbuilder.PythonFiles.Calendar.CalendarInterface import CalendarInterface
 from eventcalendarbuilder.PythonFiles.Calendar.calendar_constants import ScheduleStatus, DEFAULT_CALENDAR, GOOGLE_CALENDAR, OUTLOOK_CALENDAR
 import eventcalendarbuilder.PythonFiles.Calendar.Outlook.OutlookInterface as outlook_interface
@@ -368,7 +367,7 @@ class EventsManager:
             file = CalendarInterface.getICSFilePath(filename)
             def schedule_mac(): 
                 subprocess.run(['open', file])
-                schedule_cb(id=uuid4(), platform=DEFAULT_CALENDAR)
+                schedule_cb(id=0, platform=DEFAULT_CALENDAR)
             return [], schedule_mac
         # Windows
         else:
